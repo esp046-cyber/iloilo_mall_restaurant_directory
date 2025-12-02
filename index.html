@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iloilo Malls & Restaurants Directory</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        h1 {
+            color: #333;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        .controls {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 250px;
+            position: relative;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 12px 45px 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .search-icon {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+        }
+
+        .filter-tabs {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            padding: 12px 24px;
+            border: none;
+            background: #f0f0f0;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+
+        .tab-btn:hover {
+            background: #e0e0e0;
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+        }
+
+        .card-title {
+            font-size: 1.5em;
+            margin-bottom: 5px;
+        }
+
+        .card-type {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        .card-body {
+            padding: 20px;
+        }
+
+        .info-row {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 12px;
+            font-size: 0.95em;
+        }
+
+        .info-icon {
+            margin-right: 10px;
+            color: #667eea;
+            min-width: 20px;
+        }
+
+        .info-text {
+            color: #555;
+            line-height: 1.5;
+        }
+
+        .features {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 15px;
+        }
+
+        .feature-tag {
+            background: #f0f0f0;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            color: #555;
+        }
+
+        .pagination {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .page-btn {
+            padding: 10px 16px;
+            border: 2px solid #e0e0e0;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: all 0.3s;
+            min-width: 45px;
+        }
+
+        .page-btn:hover:not(:disabled) {
+            border-color: #667eea;
+            color: #667eea;
+        }
+
+        .page-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: transparent;
+        }
+
+        .page-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .no-results {
+            background: white;
+            padding: 60px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            text-align: center;
+            color: #999;
+            font-size: 1.2em;
+        }
+
+        .stats {
+            background: white;
+            padding: 15px 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            text-align: center;
+            color: #666;
+            font-size: 0.95em;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.8em;
+            }
+
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            .controls {
+                flex-direction: column;
+            }
+
+            .search-box {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🏢 Iloilo Directory</h1>
+            <p class="subtitle">Discover Malls & Restaurants in Iloilo City</p>
+        </header>
+
+        <div class="controls">
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="Search malls or restaurants...">
+                <span class="search-icon">🔍</span>
+            </div>
+            <div class="filter-tabs">
+                <button class="tab-btn active" data-filter="all">All</button>
+                <button class="tab-btn" data-filter="mall">Malls</button>
+                <button class="tab-btn" data-filter="restaurant">Restaurants</button>
+            </div>
+        </div>
+
+        <div class="stats" id="stats"></div>
+
+        <div class="grid" id="grid"></div>
+
+        <div class="pagination" id="pagination"></div>
+    </div>
+
+    <script>
+        // Complete dataset of Iloilo malls and restaurants
+        const data = [
+            // Malls
+            {
+                name: "SM City Iloilo",
+                type: "mall",
+                location: "Benigno Aquino Avenue, Mandurriao",
+                description: "The largest mall in Western Visayas with over 400 stores",
+                features: ["Cinema", "Department Store", "Supermarket", "Food Court", "Cyberzone", "Parking"],
+                hours: "10:00 AM - 9:00 PM"
+            },
+            {
+                name: "Robinsons Place Iloilo",
+                type: "mall",
+                location: "E. Lopez Street, Jaro",
+                description: "Major shopping destination with diverse retail and dining options",
+                features: ["Cinema", "Department Store", "Supermarket", "Food Hall", "Entertainment Center"],
+                hours: "10:00 AM - 9:00 PM"
+            },
+            {
+                name: "Gaisano City Iloilo",
+                type: "mall",
+                location: "Iznart Street, City Proper",
+                description: "Downtown shopping mall with affordable retail options",
+                features: ["Department Store", "Supermarket", "Food Court", "Appliance Center"],
+                hours: "9:00 AM - 8:00 PM"
+            },
+            {
+                name: "Atria Park District",
+                type: "mall",
+                location: "Brgy. San Rafael, Mandurriao",
+                description: "Modern lifestyle hub with premium retail and dining",
+                features: ["Specialty Stores", "Restaurants", "Event Space", "Park Area"],
+                hours: "10:00 AM - 10:00 PM"
+            },
+            {
+                name: "Festive Walk Iloilo",
+                type: "mall",
+                location: "Megaworld Boulevard, Mandurriao",
+                description: "Outdoor lifestyle mall with al fresco dining and shops",
+                features: ["Restaurants", "Retail Shops", "Entertainment", "Open-air Design"],
+                hours: "10:00 AM - 10:00 PM"
+            },
+            {
+                name: "Iloilo Supermart",
+                type: "mall",
+                location: "E. Lopez Street, Jaro",
+                description: "Community shopping center with grocery and retail",
+                features: ["Supermarket", "Department Store", "Food Stalls", "Hardware"],
+                hours: "8:00 AM - 8:00 PM"
+            },
+            {
+                name: "Plazuela de Iloilo",
+                type: "mall",
+                location: "Infante Street, Molo",
+                description: "Spanish-inspired shopping and dining complex",
+                features: ["Boutiques", "Restaurants", "Cafes", "Event Venue"],
+                hours: "10:00 AM - 10:00 PM"
+            },
+            {
+                name: "The Shops at Atria",
+                type: "mall",
+                location: "Brgy. San Rafael, Mandurriao",
+                description: "Upscale retail and dining destination",
+                features: ["Premium Shops", "Fine Dining", "Specialty Stores"],
+                hours: "10:00 AM - 9:00 PM"
+            },
+            // Restaurants
+            {
+                name: "Breakthrough Restaurant",
+                type: "restaurant",
+                location: "Villa Beach, Arevalo",
+                description: "Famous for fresh seafood with beachfront dining",
+                features: ["Seafood", "Filipino Cuisine", "Beach View", "Family-friendly"],
+                hours: "10:00 AM - 9:00 PM"
+            },
+            {
+                name: "Tatoy's Manokan and Seafoods",
+                type: "restaurant",
+                location: "Villa Beach, Arevalo",
+                description: "Iconic seafood restaurant known for grilled specialties",
+                features: ["Seafood", "Grilled Dishes", "Local Favorites", "Waterfront"],
+                hours: "10:00 AM - 9:00 PM"
+            },
+            {
+                name: "Netong's Original Special La Paz Batchoy",
+                type: "restaurant",
+                location: "La Paz Public Market",
+                description: "Home of the authentic La Paz Batchoy",
+                features: ["Batchoy", "Noodle Soup", "Local Delicacy", "Quick Service"],
+                hours: "6:00 AM - 6:00 PM"
+            },
+            {
+                name: "Deco's La Paz Batchoy",
+                type: "restaurant",
+                location: "Lopez Jaena Street, City Proper",
+                description: "Another legendary batchoy destination",
+                features: ["Batchoy", "Filipino Cuisine", "Historic", "Affordable"],
+                hours: "7:00 AM - 8:00 PM"
+            },
+            {
+                name: "Afrique's Chicken",
+                type: "restaurant",
+                location: "General Luna Street, City Proper",
+                description: "Popular for grilled chicken and Filipino dishes",
+                features: ["Grilled Chicken", "Filipino Cuisine", "Casual Dining"],
+                hours: "10:00 AM - 9:00 PM"
+            },
+            {
+                name: "Bourbon Street",
+                type: "restaurant",
+                location: "Smallville Complex, Mandurriao",
+                description: "American-style bar and grill with live music",
+                features: ["American Cuisine", "Bar", "Live Music", "Nightlife"],
+                hours: "5:00 PM - 2:00 AM"
+            },
+            {
+                name: "Ted's Oldtimer Lapaz Batchoy",
+                type: "restaurant",
+                location: "La Paz Public Market",
+                description: "Traditional batchoy served since 1945",
+                features: ["Batchoy", "Heritage Recipe", "Local Icon"],
+                hours: "6:00 AM - 6:00 PM"
+            },
+            {
+                name: "Madge Cafe",
+                type: "restaurant",
+                location: "La Paz District",
+                description: "Cozy cafe serving batchoy and Filipino breakfast",
+                features: ["Cafe", "Breakfast", "Batchoy", "Coffee"],
+                hours: "6:00 AM - 8:00 PM"
+            },
+            {
+                name: "Freska",
+                type: "restaurant",
+                location: "Festive Walk Parade, Mandurriao",
+                description: "Modern Filipino cuisine in upscale setting",
+                features: ["Filipino Fusion", "Contemporary", "Fine Dining"],
+                hours: "11:00 AM - 10:00 PM"
+            },
+            {
+                name: "Sunset Grill",
+                type: "restaurant",
+                location: "Villa Beach, Arevalo",
+                description: "Seafood restaurant with stunning sunset views",
+                features: ["Seafood", "Sunset Views", "Romantic", "Outdoor Seating"],
+                hours: "11:00 AM - 10:00 PM"
+            },
+            {
+                name: "Buto't Balat",
+                type: "restaurant",
+                location: "Diversion Road, Mandurriao",
+                description: "Grilled chicken and native Filipino dishes",
+                features: ["Grilled Chicken", "Filipino Cuisine", "Casual"],
+                hours: "10:00 AM - 10:00 PM"
+            },
+            {
+                name: "Camiña Balay nga Bato",
+                type: "restaurant",
+                location: "Molo District",
+                description: "Heritage house restaurant serving Ilonggo cuisine",
+                features: ["Heritage Dining", "Ilonggo Cuisine", "Historic Venue"],
+                hours: "11:00 AM - 9:00 PM"
+            },
+            {
+                name: "Chicken Deli",
+                type: "restaurant",
+                location: "Multiple Locations",
+                description: "Local fast food chain famous for fried chicken",
+                features: ["Fried Chicken", "Fast Food", "Local Chain", "Affordable"],
+                hours: "9:00 AM - 9:00 PM"
+            },
+            {
+                name: "Roberto's Siopao",
+                type: "restaurant",
+                location: "Quezon Street, City Proper",
+                description: "Famous for siopao and Filipino snacks",
+                features: ["Siopao", "Snacks", "Takeout", "Quick Bites"],
+                hours: "8:00 AM - 8:00 PM"
+            },
+            {
+                name: "Ponsyon by Breakthrough",
+                type: "restaurant",
+                location: "Gen. Luna Street, City Proper",
+                description: "Seafood restaurant by the famous Breakthrough brand",
+                features: ["Seafood", "Filipino Cuisine", "City Location"],
+                hours: "10:00 AM - 9:00 PM"
+            },
+            {
+                name: "The Granary Kitchen + Bar",
+                type: "restaurant",
+                location: "Festive Walk, Mandurriao",
+                description: "Farm-to-table concept with craft cocktails",
+                features: ["Farm-to-table", "Cocktails", "Modern Cuisine", "Bar"],
+                hours: "11:00 AM - 11:00 PM"
+            },
+            {
+                name: "Punot Restaurant",
+                type: "restaurant",
+                location: "Brgy. Dungon, Jaro",
+                description: "Garden restaurant serving Filipino comfort food",
+                features: ["Garden Setting", "Filipino Cuisine", "Family-friendly"],
+                hours: "11:00 AM - 9:00 PM"
+            },
+            {
+                name: "Pepper Lunch",
+                type: "restaurant",
+                location: "SM City Iloilo",
+                description: "Japanese DIY teppanyaki restaurant",
+                features: ["Japanese", "Teppanyaki", "Interactive Dining"],
+                hours: "10:00 AM - 9:00 PM"
+            },
+            // Additional Malls
+            {
+                name: "Iloilo Central Market",
+                type: "mall",
+                location: "Muelle Loney Street, City Proper",
+                description: "Historic public market with local vendors and fresh produce",
+                features: ["Public Market", "Fresh Produce", "Local Goods", "Wet Market"],
+                hours: "5:00 AM - 6:00 PM"
+            },
+            {
+                name: "Amigo Terrace Hotel Mall",
+                type: "mall",
+                location: "Amigo Terrace Hotel, City Proper",
+                description: "Small shopping arcade within Amigo Terrace Hotel",
+                features: ["Hotel Shops", "Convenience Stores", "Cafes"],
+                hours: "8:00 AM - 8:00 PM"
+            },
+            {
+                name: "Marymart Mall Mandurriao",
+                type: "mall",
+                location: "Diversion Road, Mandurriao",
+                description: "Community mall with grocery and retail stores",
+                features: ["Supermarket", "Department Store", "Food Court", "Hardware"],
+                hours: "8:00 AM - 8:00 PM"
+            },
+            {
+                name: "City Mall",
+                type: "mall",
+                location: "Tagbak Terminal, Jaro",
+                description: "Budget-friendly shopping center near transportation hub",
+                features: ["Retail Shops", "Food Stalls", "Grocery", "Affordable"],
+                hours: "8:00 AM - 8:00 PM"
+            },
+            {
+                name: "SM Delgado",
+                type: "mall",
+                location: "Muelle Loney Street, City Proper",
+                description: "Smaller SM branch focused on grocery and essentials",
+                features: ["Supermarket", "Department Store", "Banking", "Pharmacy"],
+                hours: "9:00 AM - 9:00 PM"
+            },
+            {
+                name: "Gaisano Capital South",
+                type: "mall",
+                location: "Brgy. Mohon, Arevalo",
+                description: "Neighborhood shopping center with basic retail needs",
+                features: ["Supermarket", "Clothing", "Food Court", "Parking"],
+                hours: "9:00 AM - 8:00 PM"
+            },
+            {
+                name: "Jaro Big Market",
+                type: "mall",
+                location: "E. Lopez Street, Jaro",
+                description: "Traditional market complex with diverse vendors",
+                features: ["Public Market", "Fresh Food", "Local Products", "Wholesale"],
+                hours: "5:00 AM - 7:00 PM"
+            },
+            {
+                name: "Smallville Complex",
+                type: "mall",
+                location: "Diversion Road, Mandurriao",
+                description: "Entertainment and dining district with bars and restaurants",
+                features: ["Restaurants", "Bars", "Nightlife", "Live Music"],
+                hours: "5:00 PM - 3:00 AM"
+            },
+            {
+                name: "Robinsons Jaro",
+                type: "mall",
+                location: "Lopez Jaena Street, Jaro",
+                description: "Smaller Robinsons branch serving Jaro district",
+                features: ["Department Store", "Grocery", "Food Hall", "Banking"],
+                hours: "10:00 AM - 9:00 PM"
+            },
+            {
+                name: "Molo Plaza Complex",
+                type: "mall",
+                location: "Molo Plaza, Molo District",
+                description: "Historic shopping area with local boutiques and shops",
+                features: ["Local Shops", "Heritage Area", "Boutiques", "Cafes"],
+                hours: "9:00 AM - 7:00 PM"
+            },
+            // Additional Restaurants
+            {
+                name: "Jo's Chicken Inato",
+                type: "restaurant",
+                location: "Multiple Locations",
+                description: "Local chain famous for authentic chicken inasal",
+                features: ["Chicken Inasal", "Filipino Cuisine", "Grilled", "Affordable"],
+                hours: "10:00 AM - 9:00 PM"
+            },
+            {
+                name: "Nang Palang",
+                type: "restaurant",
+                location: "Villa Beach, Arevalo",
+                description: "Seafood haven with fresh catch and local flavors",
+                features: ["Seafood", "Beach Dining", "Filipino", "Family-style"],
+                hours: "10:00 AM - 9:00 PM"
+            },
+            {
+                name: "Scallywags",
+                type: "restaurant",
+                location: "Smallville Complex, Mandurriao",
+                description: "Australian-inspired restaurant and bar with sports viewing",
+                features: ["Western Cuisine", "Sports Bar", "Live Sports", "Beer"],
+                hours: "4:00 PM - 2:00 AM"
+            },
+            {
+                name: "The Coffee Break",
+                type: "restaurant",
+                location: "Multiple Locations",
+                description: "Local coffee chain with pastries and light meals",
+                features: ["Coffee", "Cafe", "Pastries", "WiFi"],
+                hours: "7:00 AM - 10:00 PM"
+            },
+            {
+                name: "Kusina Tsina",
+                type: "restaurant",
+                location: "Iznart Street, City Proper",
+                description: "Authentic Chinese-Filipino cuisine in downtown Iloilo",
+                features: ["Chinese", "Filipino-Chinese", "Noodles", "Dimsum"],
+                hours: "10:00 AM - 8:00 PM"
+            },
+            {
+                name: "Shawarma Snack Center",
+                type: "restaurant",
+                location: "Multiple Locations",
+                description: "Popular Middle Eastern food chain with affordable shawarma",
+                features: ["Middle Eastern", "Shawarma", "Fast Food", "Budget-friendly"],
+                hours: "10:00 AM - 10:00 PM"
+            },
+            {
+                name: "Aida's Manokan",
+                type: "restaurant",
+                location: "Brgy. San Jose, Arevalo",
+                description: "Traditional chicken inasal with native ambiance",
+                features: ["Chicken Inasal", "Native Setting", "Grilled", "Local"],
+                hours: "10:00 AM - 9:00 PM"
+            },
+            {
+                name: "Esca's Garden",
+                type: "restaurant",
+                location: "Brgy. Buntatala, Leganes",
+                description: "Garden restaurant with Filipino comfort food and fresh ambiance",
+                features: ["Garden Dining", "Filipino Cuisine", "Farm-fresh", "Events Venue"],
+                hours: "11:00 AM - 9:00 PM"
+            },
+            {
+                name: "Boon Siam Thai Restaurant",
+                type: "restaurant",
+                location: "Smallville Complex, Mandurriao",
+                description: "Authentic Thai cuisine with traditional flavors",
+                features: ["Thai Cuisine", "Asian", "Spicy", "Authentic"],
+                hours: "11:00 AM - 10:00 PM"
+            },
+            {
+                name: "Kap Larry's",
+                type: "restaurant",
+                location: "Brgy. Bakhaw, Mandurriao",
+                description: "Filipino restaurant known for bulalo and Filipino favorites",
+                features: ["Filipino Cuisine", "Bulalo", "Comfort Food", "Family-style"],
+                hours: "10:00 AM - 9:00 PM"
+            },
+            {
+                name: "Casa Emperador",
+                type: "restaurant",
+                location: "Jaro District",
+                description: "Heritage house restaurant serving Spanish-Filipino cuisine",
+                features: ["Heritage Dining", "Spanish-Filipino", "Historic", "Elegant"],
+                hours: "11:00 AM - 9:00 PM"
+            },
+            {
+                name: "Vikings Luxury Buffet",
+                type: "restaurant",
+                location: "SM City Iloilo",
+                description: "Upscale buffet restaurant with international cuisine",
+                features: ["Buffet", "International", "Seafood", "Premium"],
+                hours: "11:00 AM - 10:00 PM"
+            },
+            {
+                name: "Mang Inasal",
+                type: "restaurant",
+                location: "Multiple Locations",
+                description: "National chain that originated from Iloilo, famous for chicken inasal",
+                features: ["Chicken Inasal", "Fast Food", "Filipino", "Unlimited Rice"],
+                hours: "10:00 AM - 9:00 PM"
+            },
+            {
+                name: "Habiba's Mediterranean Restaurant",
+                type: "restaurant",
+                location: "Atria Park District, Mandurriao",
+                description: "Mediterranean and Middle Eastern cuisine",
+                features: ["Mediterranean", "Middle Eastern", "Halal", "Healthy"],
+                hours: "11:00 AM - 10:00 PM"
+            },
+            {
+                name: "Rai Rai Ken",
+                type: "restaurant",
+                location: "Festive Walk, Mandurriao",
+                description: "Japanese ramen house with authentic Tokyo-style noodles",
+                features: ["Japanese", "Ramen", "Noodles", "Authentic"],
+                hours: "11:00 AM - 9:00 PM"
+            },
+            {
+                name: "Siomai House",
+                type: "restaurant",
+                location: "Multiple Locations",
+                description: "Quick-service siomai and Chinese snacks",
+                features: ["Chinese Snacks", "Siomai", "Fast Food", "Affordable"],
+                hours: "10:00 AM - 8:00 PM"
+            },
+            {
+                name: "Pepito's BBQ & Seafood",
+                type: "restaurant",
+                location: "Brgy. Tanza, Iloilo City",
+                description: "Grilled favorites and fresh seafood in casual setting",
+                features: ["BBQ", "Seafood", "Grilled", "Casual Dining"],
+                hours: "11:00 AM - 10:00 PM"
+            },
+            {
+                name: "Ugu Bigyan's Pottery Garden",
+                type: "restaurant",
+                location: "Brgy. Tacas, Jaro",
+                description: "Art gallery and restaurant featuring Filipino cuisine",
+                features: ["Filipino Cuisine", "Art Gallery", "Garden Setting", "Cultural"],
+                hours: "11:00 AM - 8:00 PM"
+            },
+            {
+                name: "The Original Pancit Molo House",
+                type: "restaurant",
+                location: "Arsenal Street, Molo",
+                description: "Home of the famous Pancit Molo soup",
+                features: ["Pancit Molo", "Local Delicacy", "Traditional", "Historic"],
+                hours: "8:00 AM - 7:00 PM"
+            },
+            {
+                name: "Bizu Patisserie",
+                type: "restaurant",
+                location: "Festive Walk, Mandurriao",
+                description: "French-inspired cafe with premium pastries and desserts",
+                features: ["French", "Pastries", "Desserts", "Cafe"],
+                hours: "10:00 AM - 9:00 PM"
+            },
+            {
+                name: "Army Navy Burger + Burrito",
+                type: "restaurant",
+                location: "Multiple Locations",
+                description: "American-Mexican fast casual chain",
+                features: ["American", "Mexican", "Burgers", "Burritos"],
+                hours: "10:00 AM - 9:00 PM"
+            },
+            {
+                name: "Dulgies Refreshment",
+                type: "restaurant",
+                location: "La Paz District",
+                description: "Local eatery famous for native cakes and refreshments",
+                features: ["Native Cakes", "Refreshments", "Local", "Snacks"],
+                hours: "7:00 AM - 7:00 PM"
+            },
+            {
+                name: "Everlasting Restaurant",
+                type: "restaurant",
+                location: "Gen. Luna Street, City Proper",
+                description: "Casual dining with Filipino-Chinese menu favorites",
+                features: ["Filipino-Chinese", "Casual Dining", "Affordable", "Family-friendly"],
+                hours: "10:00 AM - 9:00 PM"
+            },
+            {
+                name: "Marina Seafood Restaurant",
+                type: "restaurant",
+                location: "Villa Beach, Arevalo",
+                description: "Waterfront seafood dining with ocean views",
+                features: ["Seafood", "Waterfront", "Ocean View", "Fresh Catch"],
+                hours: "10:00 AM - 9:00 PM"
+            },
+            {
+                name: "Casa Bianca Ristorante",
+                type: "restaurant",
+                location: "Smallville Complex, Mandurriao",
+                description: "Italian restaurant with authentic pasta and pizza",
+                features: ["Italian", "Pasta", "Pizza", "Fine Dining"],
+                hours: "11:00 AM - 10:00 PM"
+            }
+        ];
+
+        // State management
+        let currentFilter = 'all';
+        let currentPage = 1;
+        let searchQuery = '';
+        const itemsPerPage = 9;
+
+        // Get filtered and searched data
+        function getFilteredData() {
+            return data.filter(item => {
+                const matchesFilter = currentFilter === 'all' || item.type === currentFilter;
+                const matchesSearch = searchQuery === '' || 
+                    item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                    item.location.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                    item.description.toLowerCase().includes(searchQuery.toLowerCase());
+                return matchesFilter && matchesSearch;
+            });
+        }
+
+        // Render cards
+        function renderCards() {
+            const filteredData = getFilteredData();
+            const startIndex = (currentPage - 1) * itemsPerPage;
+            const endIndex = startIndex + itemsPerPage;
+            const pageData = filteredData.slice(startIndex, endIndex);
+
+            const grid = document.getElementById('grid');
+            
+            if (pageData.length === 0) {
+                grid.innerHTML = '<div class="no-results">No results found. Try adjusting your search or filters.</div>';
+                return;
+            }
+
+            grid.innerHTML = pageData.map(item => `
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">${item.name}</div>
+                        <div class="card-type">${item.type === 'mall' ? '🏢 Shopping Mall' : '🍽️ Restaurant'}</div>
+                    </div>
+                    <div class="card-body">
+                        <div class="info-row">
+                            <span class="info-icon">📍</span>
+                            <span class="info-text">${item.location}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-icon">📝</span>
+                            <span class="info-text">${item.description}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-icon">🕒</span>
+                            <span class="info-text">${item.hours}</span>
+                        </div>
+                        <div class="features">
+                            ${item.features.map(feature => `<span class="feature-tag">${feature}</span>`).join('')}
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Render pagination
+        function renderPagination() {
+            const filteredData = getFilteredData();
+            const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+            const pagination = document.getElementById('pagination');
+
+            if (totalPages <= 1) {
+                pagination.innerHTML = '';
+                return;
+            }
+
+            let html = `
+                <button class="page-btn" onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>
+                    ◀ Previous
+                </button>
+            `;
+
+            // Show page numbers with ellipsis for large page counts
+            const maxVisiblePages = 5;
+            let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+            let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+
+            if (endPage - startPage < maxVisiblePages - 1) {
+                startPage = Math.max(1, endPage - maxVisiblePages + 1);
+            }
+
+            if (startPage > 1) {
+                html += `<button class="page-btn" onclick="changePage(1)">1</button>`;
+                if (startPage > 2) html += `<span style="padding: 0 10px;">...</span>`;
+            }
+
+            for (let i = startPage; i <= endPage; i++) {
+                html += `<button class="page-btn ${i === currentPage ? 'active' : ''}" onclick="changePage(${i})">${i}</button>`;
+            }
+
+            if (endPage < totalPages) {
+                if (endPage < totalPages - 1) html += `<span style="padding: 0 10px;">...</span>`;
+                html += `<button class="page-btn" onclick="changePage(${totalPages})">${totalPages}</button>`;
+            }
+
+            html += `
+                <button class="page-btn" onclick="changePage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>
+                    Next ▶
+                </button>
+            `;
+
+            pagination.innerHTML = html;
+        }
+
+        // Update stats
+        function updateStats() {
+            const filteredData = getFilteredData();
+            const stats = document.getElementById('stats');
+            const totalMalls = data.filter(item => item.type === 'mall').length;
+            const totalRestaurants = data.filter(item => item.type === 'restaurant').length;
+            
+            stats.innerHTML = `
+                Showing ${filteredData.length} of ${data.length} places 
+                (${totalMalls} Malls, ${totalRestaurants} Restaurants)
+            `;
+        }
+
+        // Change page
+        function changePage(page) {
+            const filteredData = getFilteredData();
+            const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+            
+            if (page >= 1 && page <= totalPages) {
+                currentPage = page;
+                renderCards();
+                renderPagination();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+
+        // Filter change handler
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentFilter = btn.dataset.filter;
+                currentPage = 1;
+                renderCards();
+                renderPagination();
+                updateStats();
+            });
+        });
+
+        // Search handler
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            searchQuery = e.target.value;
+            currentPage = 1;
+            renderCards();
+            renderPagination();
+            updateStats();
+        });
+
+        // Initial render
+        renderCards();
+        renderPagination();
+        updateStats();
+    </script>
+</body>
+</html>
